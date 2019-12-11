@@ -1,6 +1,12 @@
 #!/bin/bash
+#CT aka PrototypeActual
+#HAProxy 1.8.14
+#December 10th 2019
+
 #add mod_ssl to the install line if having problems with ssl; but also note it will install httpd with it.
+
 #This section grabs HAProxy installation files/dependencies
+yum update -y
 yum install wget nano gcc pcre-static pcre-devel openssl-devel -y
 wget https://www.haproxy.org/download/1.8/src/haproxy-1.8.14.tar.gz -O ~/haproxy.tar.gz
 tar xzvf ~/haproxy.tar.gz -C ~/
