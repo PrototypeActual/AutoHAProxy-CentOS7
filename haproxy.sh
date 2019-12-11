@@ -5,30 +5,53 @@
 
 #add mod_ssl to the install line if having problems with ssl; but also note it will install httpd with it.
 
-#This section grabs HAProxy installation files/dependencies
+#This section updates the machine and then grabs HAProxy installation files/dependencies
 yum update -y
-yum install wget nano gcc pcre-static pcre-devel openssl-devel -y
+
+yum install wget gcc pcre-static pcre-devel openssl-devel -y
+
 wget https://www.haproxy.org/download/1.8/src/haproxy-1.8.14.tar.gz -O ~/haproxy.tar.gz
+
 tar xzvf ~/haproxy.tar.gz -C ~/
+
 cd ~/haproxy-1.8.14
+
 make TARGET=linux2628 USE_OPENSSL=yes
+
 make install
+
 cp /usr/local/sbin/haproxy /usr/sbin/
+
 cp ~/haproxy-1.8.14/examples/haproxy.init /etc/init.d/haproxy
+
 mkdir -p /etc/haproxy
+
 mkdir -p /home/haproxy
+
 mkdir -p /var/lib/haproxy
+
 touch /var/lib/haproxy/stats
+
 useradd -r haproxy
+
 chmown haproxy:haproxy /etc/init.d/haproxy
+
 chmown haproxy:haproxy /home/haproxy
+
 sudo haproxy -v
-firewall-cmd --permanent --add-port=80/tcp
-firewall-cmd --permanent --add-port=443/tcp
-firewall-cmd --reload
+
 setsebool -P haproxy_connect_any=1
+
+firewall-cmd --permanent --add-service=http
+
+firewall-cmd --permanent --add-service=https
+
+firewall-cmd --reload
+
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/haproxy/ssl/HAProxy.localdomain.key -out /etc/haproxy/ssl/HAProxy.localdomain.crt
+
 cat > /etc/haproxy/ssl/haproxy.localdomain.key /etc/haproxy/ssl/haproxy.localdomain.crt > /etc/haproxy/ssl/haproxy.localdomain.pem
+
 cat > /etc/haproxy/haproxy.cfg <<EOF
 global
  log /dev/log local0
@@ -69,9 +92,13 @@ backend web_servers
     cookie PHPSESSID insert nocache secure maxidle 900s maxlife 3600s
     server Apache1 ENTERIPOFHTTPDSERVER:80 check cookie s1
 EOF
-nano /etc/haproxy/haproxy.cfg
+
+vi /etc/haproxy/haproxy.cfg
+
 service haproxy start
+
 systemctl enable haproxy
+
 echo "Would you like to remove the haproxy install files gathered before?"
 select yn in "Yes" "No"; do
   case $yn in
@@ -79,4 +106,5 @@ select yn in "Yes" "No"; do
     No ) exit;;
   esac
 done
+
 echo "Haproxy will probably fail regarless how flawless this was done so reboot when you can unless the error is out of the ordinary."
