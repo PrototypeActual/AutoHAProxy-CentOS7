@@ -72,8 +72,6 @@ EOF
 nano /etc/haproxy/haproxy.cfg
 service haproxy start
 systemctl enable haproxy
-echo "BE ADVISED - Script has changed from 755 permissions for /etc/init.d/haproxy instead it is using chown haproxy:haproxy.
-Also where the status file is located has been changed to the home directory."
 echo "Would you like to remove the haproxy install files gathered before?"
 select yn in "Yes" "No"; do
   case $yn in
