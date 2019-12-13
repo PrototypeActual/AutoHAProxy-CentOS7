@@ -3,7 +3,9 @@
 #HAProxy 2.1.1
 #December 10th 2019
 
-#add mod_ssl to the install line if having problems with ssl; but also note it will install httpd with it.
+echo "Here we go!"
+
+wait 3
 
 #This updates the machine and then grabs HAProxy installation files/dependencies
 yum update -y
