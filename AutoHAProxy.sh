@@ -10,11 +10,13 @@ yum update -y
 
 yum install wget gcc pcre-static pcre-devel openssl-devel -y
 
-wget https://www.haproxy.org/download/1.8/src/haproxy-1.8.14.tar.gz -O ~/haproxy.tar.gz
+mkdir ~/temp
 
-tar xzvf ~/haproxy.tar.gz -C ~/
+wget https://www.haproxy.org/download/1.8/src/haproxy-1.8.14.tar.gz -O ~/temp/haproxy.tar.gz
 
-cd ~/haproxy-1.8.14
+tar xzvf ~/temp/haproxy.tar.gz -C ~/temp/
+
+cd ~/temp/haproxy-1.8.14
 
 make TARGET=linux2628 USE_OPENSSL=yes
 
@@ -22,7 +24,7 @@ make install
 
 cp /usr/local/sbin/haproxy /usr/sbin/
 
-cp ~/haproxy-1.8.14/examples/haproxy.init /etc/init.d/haproxy
+cp ~/temp/haproxy-1.8.14/examples/haproxy.init /etc/init.d/haproxy
 
 mkdir -p /etc/haproxy
 
@@ -34,11 +36,17 @@ touch /var/lib/haproxy/stats
 
 useradd -r haproxy
 
-chown haproxy:haproxy /etc/init.d/haproxy
+chmod 755 /etc/init.d/haproxy
+
+#chown haproxy:haproxy /etc/init.d/haproxy
 
 chown haproxy:haproxy /home/haproxy
 
-sudo haproxy -v
+systemctl daemon-reload
+
+systemctl enable haproxy
+
+haproxy -v
 
 setsebool -P haproxy_connect_any=1
 
@@ -48,9 +56,13 @@ firewall-cmd --permanent --add-service=https
 
 firewall-cmd --reload
 
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/haproxy/ssl/haproxy.localdomain.key -out /etc/haproxy/ssl/haproxy.localdomain.crt
+openssl req -x509 \
+ -nodes -days 365 -newkey rsa:2048 \
+ -keyout /etc/ssl/haproxy.key \
+ -out /etc/ssl/haproxy.crt \
+ -subj "/C=US/ST=NY/L=Manhatten/CN=haproxy/emailAddress=anemailhere@test.com"
 
-cat > /etc/haproxy/ssl/haproxy.localdomain.key /etc/haproxy/ssl/haproxy.localdomain.crt > /etc/haproxy/ssl/haproxy.localdomain.pem
+cat /etc/ssl/haproxy.crt /etc/ssl/haproxy.key > /etc/ssl/haproxy.pem
 
 cat > /etc/haproxy/haproxy.cfg <<EOF
 global
@@ -77,12 +89,11 @@ defaults
    timeout client 50000ms
    timeout server 50000ms
 
-frontend seeddms.local
+frontend web_front
     bind *:80
-    bind *:443 ssl crt /etc/haproxy/ssl/haproxy.localdomain.pem
+    bind *:443 ssl crt /etc/ssl/haproxy.pem
     default_backend web_servers
     stats uri /haproxy?stats
-    server 127.0.0.1:4331 check
     stats auth admin:haproxy #user/password for stats page
 
 backend web_servers
@@ -96,16 +107,8 @@ EOF
 
 vi /etc/haproxy/haproxy.cfg
 
-service haproxy start
-
-systemctl enable haproxy
-
-echo "Would you like to remove the haproxy install files gathered before?"
-select yn in "Yes" "No"; do
-  case $yn in
-    Yes ) rm -rf /root/haproxy.tar.gz; rm -rf /root/haproxy-1.8.14; break;;
-    No ) exit;;
-  esac
-done
+rm -rf ~/temp
 
 echo "Haproxy will probably fail regarless how flawless this was done so reboot when you can unless the error is out of the ordinary."
+
+#Need to fix pulling up website using haproxy ip
