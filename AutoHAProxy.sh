@@ -5,26 +5,36 @@
 
 #add mod_ssl to the install line if having problems with ssl; but also note it will install httpd with it.
 
-#This section updates the machine and then grabs HAProxy installation files/dependencies
+#This updates the machine and then grabs HAProxy installation files/dependencies
 yum update -y
 
 yum install wget gcc pcre-static pcre-devel openssl-devel -y
+
+#This section makes a temporary folder in the current user home directory this script runs under and then downloads the HAProxy package
 
 mkdir ~/temp
 
 wget https://www.haproxy.org/download/1.8/src/haproxy-1.8.14.tar.gz -O ~/temp/haproxy.tar.gz
 
+#This part extracts the HAProxy package to the previously mentioned temp folder and then switches to the unzipped directory to compile/install
+
 tar xzvf ~/temp/haproxy.tar.gz -C ~/temp/
 
 cd ~/temp/haproxy-1.8.14
 
-make TARGET=linux2628 USE_OPENSSL=yes
+make TARGET=linux-glibc USE_OPENSSL=yes USE_SYSTEMD=1
 
 make install
 
-cp /usr/local/sbin/haproxy /usr/sbin/
+#This section copies the files in /usr/local/sbin/haproxy to the /usr/sbin but trying an alterative and lastly copies over the systemd version of HAProxy to the /lib/systemd/system/
 
-cp ~/temp/haproxy-1.8.14/examples/haproxy.init /etc/init.d/haproxy
+ln -s /usr/local/sbin/haproxy /usr/sbin/haproxy
+
+#cp ~/temp/haproxy-1.8.14/examples/haproxy.init /etc/init.d/haproxy
+
+cp ~/temp/haproxy-1.8.14/contrib/systemd/haproxy.service.in /lib/systemd/system/
+
+#This section makes new directories for HAProxy, creates the stats file for the HAProxy status page, and creates the haproxy user that the service will use to run.
 
 mkdir -p /etc/haproxy
 
@@ -36,17 +46,15 @@ touch /var/lib/haproxy/stats
 
 useradd -r haproxy
 
-chmod 755 /etc/init.d/haproxy
-
-#chown haproxy:haproxy /etc/init.d/haproxy
+#chmod 755 /etc/init.d/haproxy
 
 chown haproxy:haproxy /home/haproxy
-
-systemctl daemon-reload
 
 systemctl enable haproxy
 
 haproxy -v
+
+#This section allows HAProxy to bypass SELinux and allows traffic through Firewalld on http and https.
 
 setsebool -P haproxy_connect_any=1
 
@@ -56,6 +64,8 @@ firewall-cmd --permanent --add-service=https
 
 firewall-cmd --reload
 
+#This seciton creates a certificate/key and then creates a pem file for the use of SSL traffic. Under the -subj you should tweak these to match your server/its location. 
+
 openssl req -x509 \
  -nodes -days 365 -newkey rsa:2048 \
  -keyout /etc/ssl/haproxy.key \
@@ -64,9 +74,10 @@ openssl req -x509 \
 
 cat /etc/ssl/haproxy.crt /etc/ssl/haproxy.key > /etc/ssl/haproxy.pem
 
+#This creates the HAProxy config file and then brings up the VIM editor so you can change the server ip, make tweaks, etc.
 cat > /etc/haproxy/haproxy.cfg <<EOF
 global
- log /dev/log local0
+ log /dev/log local0 info
  log /dev/log local1 notice
  chroot /var/lib/haproxy
  stats socket /home/haproxy/admin.sock mode 660 level admin
@@ -107,8 +118,12 @@ EOF
 
 vi /etc/haproxy/haproxy.cfg
 
+systemctl restart haproxy
+
 rm -rf ~/temp
 
-echo "Haproxy will probably fail regarless how flawless this was done so reboot when you can unless the error is out of the ordinary."
+echo "HAProxy will probably fail regarless how flawless this was done so reboot when you can unless the error is out of the ordinary."
 
-#Need to fix pulling up website using haproxy ip
+echo "You can visit the HAProxy stats page by typing in the IP address of the machine you ran this script on and then adding /haproxy?stats at the end"
+
+#Verify website comes up using HAProxy IP.
