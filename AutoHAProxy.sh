@@ -5,7 +5,7 @@
 
 echo "Here we go!"
 
-wait 3
+sleep 3
 
 #This updates the machine and then grabs HAProxy installation files/dependencies
 yum update -y
@@ -142,4 +142,4 @@ rm -rf ~/temp
 
 echo "-----------------------------------------"
 
-echo "You can visit the HAProxy stats page by typing in the IP address of the machine you ran this script on and then adding /haproxy?stats at the end"
+echo "You can visit the HAProxy stats page by typing in the IP address of the machine you ran this script on and then adding /haproxy?stats at the end. The default credentials are admin for username and haproxy for password until you change this in the haproxy config file."
