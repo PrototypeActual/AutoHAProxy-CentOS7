@@ -48,7 +48,7 @@ firewall-cmd --permanent --add-service=https
 
 firewall-cmd --reload
 
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/haproxy/ssl/HAProxy.localdomain.key -out /etc/haproxy/ssl/HAProxy.localdomain.crt
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/haproxy/ssl/haproxy.localdomain.key -out /etc/haproxy/ssl/haproxy.localdomain.crt
 
 cat > /etc/haproxy/ssl/haproxy.localdomain.key /etc/haproxy/ssl/haproxy.localdomain.crt > /etc/haproxy/ssl/haproxy.localdomain.pem
 
