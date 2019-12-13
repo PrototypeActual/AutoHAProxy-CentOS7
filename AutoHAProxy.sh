@@ -34,9 +34,9 @@ touch /var/lib/haproxy/stats
 
 useradd -r haproxy
 
-chmown haproxy:haproxy /etc/init.d/haproxy
+chown haproxy:haproxy /etc/init.d/haproxy
 
-chmown haproxy:haproxy /home/haproxy
+chown haproxy:haproxy /home/haproxy
 
 sudo haproxy -v
 
