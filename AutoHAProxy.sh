@@ -83,6 +83,7 @@ frontend seeddms.local
     default_backend web_servers
     stats uri /haproxy?stats
     server 127.0.0.1:4331 check
+    stats auth admin:haproxy #user/password for stats page
 
 backend web_servers
     option httpchk
