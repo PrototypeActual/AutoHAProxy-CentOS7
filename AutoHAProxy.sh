@@ -130,6 +130,8 @@ backend web_servers
     redirect scheme https if !{ ssl_fc }
     cookie PHPSESSID insert nocache secure maxidle 900s maxlife 3600s
     server Apache1 ENTERIPOFHTTPDSERVER:80 check cookie s1
+#    server Apache2 ENTERIPOFHTTPDSERVER:80 check cookie s2
+#    server Apache3 ENTERIPOFHTTPDSERVER:80 check cookie s3
 EOF
 
 vi /etc/haproxy/haproxy.cfg
