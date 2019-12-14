@@ -5,11 +5,7 @@ What you will still need to do
 
 1. During the script it will open up the vi text editor so you can edit the last line
 
-2. The last line needs to have the server ip where it says ENTERIPOFHTTPDSERVER
-
-2a. Example below
-
-server Apache1 192.168.1.10:80 check cookie s1
+2. The last line needs to have the server ip where it says ENTERIPOFHTTPDSERVER Ex. server Apache1 192.168.1.10:80 check cookie s1
 
 3. If you need to add more servers you can enter a new line with the same format as that last line.
 
