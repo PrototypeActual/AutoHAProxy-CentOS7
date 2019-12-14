@@ -15,11 +15,6 @@ server Apache1 192.168.1.10:80 check cookie s1
 
 4. If you add more servers make sure to change the name, and IP. You also will need to change s1 to s2 and so on
 
-4a. Example below
-server Apache1 192.168.1.10:80 check cookie s1
-server Apache2 192.168.1.11:80 check cookie s2
-server Apache3 192.168.1.13:80 check cookie s3
-
 5. You will also need to update the login for the stats page or comment out
 5a. stats auth admin:haproxy
 5b. This line is located in the haproxy config file under the frontend section.
