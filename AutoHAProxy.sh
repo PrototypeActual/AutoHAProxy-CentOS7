@@ -10,7 +10,7 @@ sleep 3
 #This updates the machine and then grabs HAProxy installation files/dependencies
 yum update -y
 
-yum install wget gcc pcre-static pcre-devel openssl-devel systemd-devel -y
+yum install -y wget gcc pcre-static pcre-devel openssl-devel systemd-devel
 
 #This section makes a temporary folder in the current user home directory this script runs under and then downloads the HAProxy package
 
