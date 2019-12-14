@@ -3,14 +3,15 @@ Bash script to deploy HAProxy 2.1.1 with SSL on a fresh CentOS 7 machine with ve
 
 What you will still need to do
 
-1. During the script it will open up the vi text editor so you can edit the last line
+During the script it will open up the vi text editor so you can edit the last line
 
-2. The last line needs to have the server ip where it says ENTERIPOFHTTPDSERVER Ex. server Apache1 192.168.1.10:80 check cookie s1
+The last line needs to have the server ip where it says ENTERIPOFHTTPDSERVER Ex. server Apache1 192.168.1.10:80 check cookie s1
 
-3. If you need to add more servers you can enter a new line with the same format as that last line.
+If you need to add more servers you can enter a new line with the same format as that last line.
 
-4. If you add more servers make sure to change the name, and IP. You also will need to change s1 to s2 and so on
+If you add more servers make sure to change the name, and IP.
+-You may need to change the the number after the s to the number that server is in the list
 
-5. You will also need to update the login for the stats page or comment out
-5a. stats auth admin:haproxy
-5b. This line is located in the haproxy config file under the frontend section.
+You will also need to update the login for the stats page or comment out
+-stats auth admin:haproxy
+-This line is located in the haproxy config file under the frontend section
